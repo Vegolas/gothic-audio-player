@@ -92,14 +92,18 @@ export function activate(context: vscode.ExtensionContext) {
 			currentAudioProcess = null;
 		}
 
+		// Get volume setting
+		const volume = config.get<number>('volume') || 100;
+		const volumeDecimal = volume / 100;
+
 		// Play audio using WPF MediaPlayer
-		vscode.window.showInformationMessage(`Playing: ${audioFilePath}`);
+		vscode.window.showInformationMessage(`Playing: ${audioFilePath} (Volume: ${volume}%)`);
 
 		const spawn = require('child_process').spawn;
 		const process = spawn('powershell.exe', [
 			'-NoProfile',
 			'-Command',
-			`Add-Type -AssemblyName PresentationFramework; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open([System.Uri]"${audioFilePath}"); $player.Play(); while($player.NaturalDuration.HasTimeSpan -eq $false) { Start-Sleep -Milliseconds 100 }; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds; $player.Close()`
+			`Add-Type -AssemblyName PresentationFramework; $player = New-Object System.Windows.Media.MediaPlayer; $player.Volume = ${volumeDecimal}; $player.Open([System.Uri]"${audioFilePath}"); $player.Play(); while($player.NaturalDuration.HasTimeSpan -eq $false) { Start-Sleep -Milliseconds 100 }; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds; $player.Close()`
 		]);
 
 		currentAudioProcess = process;
