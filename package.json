@@ -1,0 +1,99 @@
+{
+  "name": "gothic-audio-player",
+  "displayName": "Gothic Audio Player",
+  "description": "Play Gothic dialogue audio files and fix Silesian encoding directly in the editor.",
+  "version": "0.1.0",
+  "publisher": "MTCode",
+  "icon": "gothic_ii_desktop_icon_by_tarvanis.png",
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gothic-audio-player.playDialogueAudio",
+        "title": "Play Gothic Audio"
+      },
+      {
+        "command": "gothic-audio-player.stopAudio",
+        "title": "Stop Gothic Audio"
+      },
+      {
+        "command": "gothic-audio-player.fixSilesian",
+        "title": "Fix Silesian"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "gothic-audio-player.playDialogueAudio",
+        "key": "ctrl+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "gothic-audio-player.stopAudio",
+        "key": "ctrl+alt+s"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gothic-audio-player.playDialogueAudio",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Gothic Audio Player",
+      "properties": {
+        "gothicAudio.searchPaths": {
+          "type": "array",
+          "default": [
+            "**/{Speech,Sounds}/**/*.wav"
+          ],
+          "description": "Glob patterns or absolute paths to search for Gothic dialogue audio files",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gothicAudio.audioDir": {
+          "type": "string",
+          "default": "E:\\Gothic\\_work\\DATA\\Sound\\Speech",
+          "description": "Custom base directory for audio files (overrides searchPaths if set)"
+        },
+        "gothicAudio.volume": {
+          "type": "number",
+          "default": 100,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Volume level for audio playback (0-100)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.106.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.46.3",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
