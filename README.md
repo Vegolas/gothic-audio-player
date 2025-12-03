@@ -4,13 +4,13 @@ Play Gothic dialogue audio files and fix Silesian encoding directly in VS Code.
 
 ## Features
 
-### ?? Audio Playback
+### Audio Playback
 - **Inline Play Buttons**: Click the play button above any `AI_Output` line to hear the dialogue
 - **Quick Access**: Use `Ctrl+Alt+P` to play audio for the current line
 - **Stop Playback**: Press `Ctrl+Alt+S` to stop currently playing audio
 - **Auto-detection**: Automatically finds dialogue IDs in your `.d` files
 
-### ?? Silesian Encoding Fix
+### Silesian Encoding Fix
 - **One-click fix**: Converts broken Silesian characters to proper encoding
 - Replaces: `?` ? `ä`, `!O` ? `Ô`, `!o` ? `ô`, `@o` ? `ä`
 - Use command palette: "Fix Silesian"

@@ -95,9 +95,12 @@ export function activate(context: vscode.ExtensionContext) {
 		// Get volume setting
 		const volume = config.get<number>('volume') || 100;
 		const volumeDecimal = volume / 100;
+		const showNotification = config.get<boolean>('showPlaybackNotification') !== false;
 
 		// Play audio using WPF MediaPlayer
-		vscode.window.showInformationMessage(`Playing: ${audioFilePath} (Volume: ${volume}%)`);
+		if (showNotification) {
+			vscode.window.showInformationMessage(`Playing: ${audioFilePath} (Volume: ${volume}%)`);
+		}
 
 		const spawn = require('child_process').spawn;
 		const process = spawn('powershell.exe', [
