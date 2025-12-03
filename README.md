@@ -45,4 +45,8 @@ Initial release:
 - Fix Silesian encoding command
 - Configurable audio directory
 
+--
+
+This whole extension was vibe-coded with Claude Sonnet 4.5. I don't know anything abou node.js, typescript and needed this thing ASAP. ;)
+
 **Enjoy!**
