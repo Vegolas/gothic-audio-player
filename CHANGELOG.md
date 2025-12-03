@@ -1,4 +1,8 @@
 # Change Log
+
+# 0.1.3
+- Added functionality to work with  `SVM` files.
+
 # 0.1.2 
 - Default informational popup about audio playing is now optional. You can disable it in settings.
 

@@ -37,18 +37,24 @@ export function activate(context: vscode.ExtensionContext) {
 			const lineText = currentLine.text;
 
 			// Try to match AI_Output on the current line
-			const lineMatch = lineText.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
+			let lineMatch = lineText.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
 			if (lineMatch) {
 				dialogueId = lineMatch[1];
 			} else {
-				// Fallback: search entire document
-				const text = document.getText();
-				const match = text.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
-				if (!match) {
-					vscode.window.showWarningMessage('No AI_Output dialogue found. Place cursor on a line with AI_Output.');
-					return;
+				// Try to match SVM pattern: variable = "SVM_XX_Name"
+				lineMatch = lineText.match(/=\s*"([^"]+)"\s*;/);
+				if (lineMatch) {
+					dialogueId = lineMatch[1];
+				} else {
+					// Fallback: search entire document
+					const text = document.getText();
+					const match = text.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
+					if (!match) {
+						vscode.window.showWarningMessage('No dialogue found. Place cursor on a line with AI_Output or SVM pattern.');
+						return;
+					}
+					dialogueId = match[1];
 				}
-				dialogueId = match[1];
 			}
 		}
 
@@ -194,10 +200,30 @@ export function activate(context: vscode.ExtensionContext) {
 			provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
 				const codeLenses: vscode.CodeLens[] = [];
 				const text = document.getText();
-				const regex = /AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/g;
+
+				// Match AI_Output patterns
+				const aiOutputRegex = /AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/g;
 				let match;
 
-				while ((match = regex.exec(text)) !== null) {
+				while ((match = aiOutputRegex.exec(text)) !== null) {
+					const dialogueId = match[1];
+					const startPos = document.positionAt(match.index);
+					const endPos = document.positionAt(match.index + match[0].length);
+					const range = new vscode.Range(startPos, endPos);
+
+					const codeLens = new vscode.CodeLens(range);
+					codeLens.command = {
+						title: `\u{1F50A} Play ${dialogueId}`,
+						command: 'gothic-audio-player.playDialogueAudio',
+						arguments: [dialogueId]
+					};
+
+					codeLenses.push(codeLens);
+				}
+
+				// Match SVM patterns: variable = "SVM_XX_Name";
+				const svmRegex = /=\s*"(SVM_[^"]+)"\s*;/g;
+				while ((match = svmRegex.exec(text)) !== null) {
 					const dialogueId = match[1];
 					const startPos = document.positionAt(match.index);
 					const endPos = document.positionAt(match.index + match[0].length);

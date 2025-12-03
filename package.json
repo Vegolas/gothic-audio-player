@@ -2,7 +2,7 @@
   "name": "gothic-audio-player",
   "displayName": "Gothic Audio Player",
   "description": "Play Gothic dialogue audio files and fix Silesian encoding directly in the editor.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "MTCode",
   "icon": "gothic_ii_desktop_icon_by_tarvanis.png",
   "repository": {
