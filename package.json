@@ -5,6 +5,14 @@
   "version": "0.1.0",
   "publisher": "MTCode",
   "icon": "gothic_ii_desktop_icon_by_tarvanis.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vegolas/gothic-audio-player"
+  },
+  "bugs": {
+    "url": "https://github.com/Vegolas/gothic-audio-player/issues"
+  },
+  "homepage": "https://github.com/Vegolas/gothic-audio-player#readme",
   "engines": {
     "vscode": "^1.106.1"
   },
