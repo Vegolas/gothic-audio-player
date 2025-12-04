@@ -1,3 +1,6 @@
+# Publish files
+*.vsix
+
 # Logs
 logs
 *.log
