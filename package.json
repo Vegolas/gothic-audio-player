@@ -2,7 +2,7 @@
   "name": "gothic-audio-player",
   "displayName": "Gothic Audio Player",
   "description": "Play Gothic dialogue audio files and fix Silesian encoding directly in the editor.",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "publisher": "MTCode",
   "icon": "gothic_ii_desktop_icon_by_tarvanis.png",
   "repository": {
@@ -70,6 +70,19 @@
           "default": "",
           "description": "Base directory for Gothic audio files (e.g., Gothic/Data/Speech)"
         },
+        "gothicAudio.audioFormat": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "standard",
+            "vorbis-ogg"
+          ],
+          "enumDescriptions": [
+            "Standard WAV files (uses Windows Media Player)",
+            "Vorbis OGG encoded WAV files (Union patch format)"
+          ],
+          "description": "Audio format type for playback"
+        },
         "gothicAudio.volume": {
           "type": "number",
           "default": 100,
@@ -81,6 +94,12 @@
           "type": "boolean",
           "default": true,
           "description": "Show notification when audio playback starts"
+        }
+        ,
+        "gothicAudio.registerFixSilesian": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable the Fix Silesian command. It's disabled by default to avoid cluttering the command palette since it's niche to my (author) project."
         }
       }
     }
