@@ -17,7 +17,7 @@ export async function checkAndPromptForAudioDirectory() {
 				canSelectFolders: true,
 				canSelectMany: false,
 				openLabel: 'Select Gothic Audio Directory',
-				title: 'Select Gothic Audio Directory (e.g., Gothic/Data/Speech or Gothic/_work/data/Speech)'
+				title: 'Select Gothic Audio Directory (e.g., `Gothic/_work/DATA/Sound/Speech`)'
 			});
 
 			if (selectedFolder && selectedFolder[0]) {

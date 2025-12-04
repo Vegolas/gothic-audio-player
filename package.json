@@ -36,6 +36,10 @@
       {
         "command": "gothic-audio-player.fixSilesian",
         "title": "Fix Silesian"
+      },
+      {
+        "command": "gothic-audio-player.verifyDialogues",
+        "title": "Verify All Dialogues in File"
       }
     ],
     "keybindings": [
@@ -94,12 +98,58 @@
           "type": "boolean",
           "default": true,
           "description": "Show notification when audio playback starts"
-        }
-        ,
+        },
         "gothicAudio.registerFixSilesian": {
           "type": "boolean",
           "default": false,
           "description": "Enable the Fix Silesian command. It's disabled by default to avoid cluttering the command palette since it's niche to my (author) project."
+        },
+        "gothicAudio.transcription.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable dialogue transcription verification feature"
+        },
+        "gothicAudio.transcription.apiProvider": {
+          "type": "string",
+          "default": "openai",
+          "enum": [
+            "openai"
+          ],
+          "enumDescriptions": [
+            "OpenAI Whisper API"
+          ],
+          "description": "API provider for audio transcription"
+        },
+        "gothicAudio.transcription.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for transcription service"
+        },
+        "gothicAudio.transcription.language": {
+          "type": "string",
+          "default": "de",
+          "enum": [
+            "de",
+            "en",
+            "pl",
+            "cs",
+            "auto"
+          ],
+          "enumDescriptions": [
+            "German",
+            "English",
+            "Polish",
+            "Czech",
+            "Auto-detect"
+          ],
+          "description": "Language for transcription"
+        },
+        "gothicAudio.transcription.confidenceThreshold": {
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum confidence score (0-1) to flag transcription for review"
         }
       }
     }
@@ -113,13 +163,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.106.1",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.46.3",
+    "@types/vscode": "^1.106.1",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.1",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.46.3"
+  },
+  "dependencies": {
+    "openai": "^6.9.1"
   }
 }

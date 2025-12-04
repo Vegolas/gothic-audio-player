@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ChildProcess } from 'child_process';
+import { isLineInComment } from '../utils/commentChecker';
 
 let currentAudioProcess: ChildProcess | null = null;
 
@@ -21,25 +22,30 @@ export function registerPlayDialogueAudioCommand(context: vscode.ExtensionContex
 			const currentLine = document.lineAt(selection.active.line);
 			const lineText = currentLine.text;
 
-			// Try to match AI_Output on the current line
-			let lineMatch = lineText.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
-			if (lineMatch) {
-				dialogueId = lineMatch[1];
-			} else {
-				// Try to match SVM pattern: variable = "SVM_XX_Name"
-				lineMatch = lineText.match(/=\s*"([^"]+)"\s*;/);
+			// Skip if current line is commented out
+			if (!isLineInComment(document, selection.active.line)) {
+				// Try to match AI_Output on the current line
+				let lineMatch = lineText.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
 				if (lineMatch) {
-					dialogueId = lineMatch[1];
+					dialogueId = lineMatch[1];;
 				} else {
-					// Fallback: search entire document
-					const text = document.getText();
-					const match = text.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
-					if (!match) {
-						vscode.window.showWarningMessage('No dialogue found. Place cursor on a line with AI_Output or SVM pattern.');
-						return;
+					// Try to match SVM pattern: variable = "SVM_XX_Name"
+					lineMatch = lineText.match(/=\s*"([^"]+)"\s*;/);
+					if (lineMatch) {
+						dialogueId = lineMatch[1];
 					}
-					dialogueId = match[1];
 				}
+			}
+
+			// If still no dialogue found, fallback to searching entire document
+			if (!dialogueId) {
+				const text = document.getText();
+				const match = text.match(/AI_Output\s*\([^,]+,\s*[^,]+,\s*"([^"]+)"\)/);
+				if (!match) {
+					vscode.window.showWarningMessage('No dialogue found. Place cursor on a line with AI_Output or SVM pattern.');
+					return;
+				}
+				dialogueId = match[1];
 			}
 		}
 

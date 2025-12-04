@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { isPositionInComment } from '../utils/commentChecker';
 
 export function registerCodeLensProvider(context: vscode.ExtensionContext) {
 	const codeLensProvider = vscode.languages.registerCodeLensProvider(
@@ -13,6 +14,11 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext) {
 				let match;
 
 				while ((match = aiOutputRegex.exec(text)) !== null) {
+					// Skip if in comment
+					if (isPositionInComment(document, match.index)) {
+						continue;
+					}
+
 					const dialogueId = match[1];
 					const startPos = document.positionAt(match.index);
 					const endPos = document.positionAt(match.index + match[0].length);
@@ -31,6 +37,11 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext) {
 				// Match SVM patterns: variable = "SVM_XX_Name";
 				const svmRegex = /=\s*"(SVM_[^"]+)"\s*;/g;
 				while ((match = svmRegex.exec(text)) !== null) {
+					// Skip if in comment
+					if (isPositionInComment(document, match.index)) {
+						continue;
+					}
+
 					const dialogueId = match[1];
 					const startPos = document.positionAt(match.index);
 					const endPos = document.positionAt(match.index + match[0].length);
