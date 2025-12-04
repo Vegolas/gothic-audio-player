@@ -1,13 +1,7 @@
 import * as vscode from 'vscode';
 
 export function registerFixSilesianCommand(context: vscode.ExtensionContext) {
-    const config = vscode.workspace.getConfiguration('gothicAudio');
-    const registerFixSilesian = config.get<boolean>('registerFixSilesian', false);
-
-    if (!registerFixSilesian) {
-        return;
-    }
-    
+	// Command is always registered but visibility is controlled by package.json enablement clause
 	const fixSilesianDisposable = vscode.commands.registerCommand('gothic-audio-player.fixSilesian', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {

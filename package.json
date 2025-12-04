@@ -35,7 +35,8 @@
       },
       {
         "command": "gothic-audio-player.fixSilesian",
-        "title": "Fix Silesian"
+        "title": "Fix Silesian",
+        "enablement": "config.gothicAudio.registerFixSilesian"
       },
       {
         "command": "gothic-audio-player.verifyDialogues",
@@ -54,7 +55,8 @@
       },
       {
         "command": "gothic-audio-player.fixSilesian",
-        "key": "ctrl+alt+["
+        "key": "ctrl+alt+[",
+        "when": "config.gothicAudio.registerFixSilesian"
       }
     ],
     "menus": {
