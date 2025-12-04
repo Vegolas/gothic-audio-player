@@ -83,38 +83,76 @@ export function registerPlayDialogueAudioCommand(context: vscode.ExtensionContex
 			vscode.window.showInformationMessage(`Playing: ${audioFilePath} (Volume: ${volume}%)`);
 		}
 
-		const spawn = require('child_process').spawn;
-		let process: ChildProcess;
+	const spawn = require('child_process').spawn;
+	let process: ChildProcess;
 
-		// Choose playback method based on audio format
-		if (audioFormat === 'vorbis-ogg') {
-			// TODO: Implement Vorbis OGG playback
-			// For now, show error message
-			vscode.window.showErrorMessage('Vorbis OGG playback not yet implemented. Please wait for the next update.');
-			return;
-		} else {
-			// Standard WAV playback using Windows Media Player
-			process = spawn('powershell.exe', [
-				'-NoProfile',
-				'-Command',
-				`Add-Type -AssemblyName PresentationFramework; $player = New-Object System.Windows.Media.MediaPlayer; $player.Volume = ${volumeDecimal}; $player.Open([System.Uri]"${audioFilePath}"); $player.Play(); while($player.NaturalDuration.HasTimeSpan -eq $false) { Start-Sleep -Milliseconds 100 }; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds; $player.Close()`
-			]);
+	// Choose playback method based on audio format
+	if (audioFormat === 'ffplay') {
+		// FFplay playback (supports Vorbis OGG and other formats)
+		// Check if ffplay is available, otherwise show helpful error
+		const volumePercent = Math.floor(volumeDecimal * 100);
+		process = spawn('powershell.exe', [
+			'-NoProfile',
+			'-Command',
+			`$ffplay = Get-Command ffplay -ErrorAction SilentlyContinue; if ($ffplay) { & ffplay -nodisp -autoexit -volume ${volumePercent} "${audioFilePath}" 2>$null } else { Write-Error "FFmpeg is required for ffplay playback. Please install FFmpeg and add it to your PATH, or change the audio format setting to 'standard' or 'process-start'." }`
+		]);
+		
+		// Capture stderr to detect if ffplay is missing
+		let errorOutput = '';
+		process.stderr?.on('data', (data: Buffer) => {
+			errorOutput += data.toString();
+		});
+		
+		process.on('exit', (code) => {
+			if (currentAudioProcess === process) {
+				currentAudioProcess = null;
+			}
+			if (errorOutput.includes('FFmpeg is required')) {
+				vscode.window.showErrorMessage(
+					'FFplay requires FFmpeg to be installed. Download from https://ffmpeg.org/download.html and add to PATH, or change "Gothic Audio: Audio Format" to "standard" or "process-start".',
+					'Open Settings'
+				).then(selection => {
+					if (selection === 'Open Settings') {
+						vscode.commands.executeCommand('workbench.action.openSettings', 'gothicAudio.audioFormat');
+					}
+				});
+			}
+		});
+	} else if (audioFormat === 'process-start') {
+		// Process Start - opens the file with default system player
+		process = spawn('powershell.exe', [
+			'-NoProfile',
+			'-Command',
+			`Start-Process -FilePath "${audioFilePath}"`
+		]);
+		
+		// Note: Volume control is not available with process-start method
+		if (showNotification) {
+			vscode.window.showInformationMessage(`Opening: ${audioFilePath} (Volume control not available with process-start)`);
 		}
+	} else {
+		// Standard WAV playback using Windows Media Player
+		process = spawn('powershell.exe', [
+			'-NoProfile',
+			'-Command',
+			`Add-Type -AssemblyName PresentationFramework; $player = New-Object System.Windows.Media.MediaPlayer; $player.Volume = ${volumeDecimal}; $player.Open([System.Uri]"${audioFilePath}"); $player.Play(); while($player.NaturalDuration.HasTimeSpan -eq $false) { Start-Sleep -Milliseconds 100 }; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds; $player.Close()`
+		]);
+	}
 
-		currentAudioProcess = process;
+	currentAudioProcess = process;
+	
+	process.on('exit', () => {
+		if (currentAudioProcess === process) {
+			currentAudioProcess = null;
+		}
+	});
 
-		process.on('exit', () => {
-			if (currentAudioProcess === process) {
-				currentAudioProcess = null;
-			}
-		});
-
-		process.on('error', (error: any) => {
-			if (currentAudioProcess === process) {
-				currentAudioProcess = null;
-			}
-			vscode.window.showErrorMessage(`Failed to play audio: ${error.message}`);
-		});
+	process.on('error', (error: any) => {
+		if (currentAudioProcess === process) {
+			currentAudioProcess = null;
+		}
+		vscode.window.showErrorMessage(`Failed to play audio: ${error.message}`);
+	});
 	});
 
 	context.subscriptions.push(disposable);

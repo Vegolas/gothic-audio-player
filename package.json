@@ -79,13 +79,15 @@
           "default": "standard",
           "enum": [
             "standard",
-            "vorbis-ogg"
+            "ffplay",
+            "process-start"
           ],
           "enumDescriptions": [
             "Standard WAV files (uses Windows Media Player)",
-            "Vorbis OGG encoded WAV files (Union patch format)"
+            "Vorbis OGG or other formats via FFplay (requires FFmpeg installation)",
+            "Start file with default system player (opens external application)"
           ],
-          "description": "Audio format type for playback"
+          "description": "Audio playback method"
         },
         "gothicAudio.volume": {
           "type": "number",
