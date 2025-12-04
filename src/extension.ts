@@ -8,6 +8,36 @@ import { ChildProcess } from 'child_process';
 // Track currently playing audio process
 let currentAudioProcess: ChildProcess | null = null;
 
+// Check if audio directory is configured and prompt user if not
+async function checkAndPromptForAudioDirectory() {
+	const config = vscode.workspace.getConfiguration('gothicAudio');
+	const audioDir = config.get<string>('audioDir');
+
+	if (!audioDir || audioDir.trim() === '') {
+		const action = await vscode.window.showWarningMessage(
+			'Gothic Audio Player: No audio directory configured. Please select the Gothic audio directory.',
+			'Select Directory',
+			'Later'
+		);
+
+		if (action === 'Select Directory') {
+			const selectedFolder = await vscode.window.showOpenDialog({
+				canSelectFiles: false,
+				canSelectFolders: true,
+				canSelectMany: false,
+				openLabel: 'Select Gothic Audio Directory',
+				title: 'Select Gothic Audio Directory (e.g., Gothic/Data/Speech or Gothic/_work/data/Speech)'
+			});
+
+			if (selectedFolder && selectedFolder[0]) {
+				const folderPath = selectedFolder[0].fsPath;
+				await config.update('audioDir', folderPath, vscode.ConfigurationTarget.Global);
+				vscode.window.showInformationMessage(`Gothic audio directory set to: ${folderPath}`);
+			}
+		}
+	}
+}
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -15,6 +45,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "gothic-audio-player" is now active!');
+
+	// Check if audio directory is configured, prompt if not
+	checkAndPromptForAudioDirectory();
 
 
 
@@ -61,34 +94,17 @@ export function activate(context: vscode.ExtensionContext) {
 		// Get configuration
 		const config = vscode.workspace.getConfiguration('gothicAudio');
 		const audioDir = config.get<string>('audioDir') || '';
-		const searchPaths = config.get<string[]>('searchPaths') || ['**/{Speech,Sounds}/**/*.wav'];
 
-		let audioFilePath: string | undefined;
-
-		// If audioDir is set, search directly in that path
-		if (audioDir) {
-			const audioPath = path.join(audioDir, `${dialogueId}.wav`);
-
-			if (fs.existsSync(audioPath)) {
-				audioFilePath = audioPath;
-			}
+		if (!audioDir) {
+			vscode.window.showWarningMessage('Gothic audio directory not configured. Please set gothicAudio.audioDir in settings.');
+			return;
 		}
 
-		// Fallback: search using workspace patterns
-		if (!audioFilePath) {
-			const audioFiles = await vscode.workspace.findFiles(searchPaths[0], undefined, 1000);
-			const audioFile = audioFiles.find(file => {
-				const fileName = file.fsPath.split(/[\\/]/).pop()?.replace(/\.wav$/i, '');
-				return fileName === dialogueId;
-			});
+		// Search for audio file in the configured directory
+		const audioFilePath = path.join(audioDir, `${dialogueId}.wav`);
 
-			if (audioFile) {
-				audioFilePath = audioFile.fsPath;
-			}
-		}
-
-		if (!audioFilePath) {
-			vscode.window.showWarningMessage(`No audio found for ${dialogueId}. Check gothicAudio settings.`);
+		if (!fs.existsSync(audioFilePath)) {
+			vscode.window.showWarningMessage(`No audio found for ${dialogueId} in ${audioDir}`);
 			return;
 		}
 
@@ -162,10 +178,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 			// Define replacements
 			const replacements = [
-				{ search: '\u014D', replace: '\u00E4' },  // ? ? ä
-				{ search: '!O', replace: '\u00D4' },      // !O ? Ô
-				{ search: '!o', replace: '\u00F4' },      // !o ? ô
-				{ search: '@o', replace: '\u00E4' }       // @o ? ä
+				{ search: '\u014D', replace: '\u00E4' },  // ? ? ï¿½
+				{ search: '!O', replace: '\u00D4' },      // !O ? ï¿½
+				{ search: '!o', replace: '\u00F4' },      // !o ? ï¿½
+				{ search: '@o', replace: '\u00E4' }       // @o ? ï¿½
 			];
 
 			for (let i = 0; i < text.length; i++) {

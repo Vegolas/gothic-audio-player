@@ -65,20 +65,10 @@
     "configuration": {
       "title": "Gothic Audio Player",
       "properties": {
-        "gothicAudio.searchPaths": {
-          "type": "array",
-          "default": [
-            "**/{Speech,Sounds}/**/*.wav"
-          ],
-          "description": "Glob patterns or absolute paths to search for Gothic dialogue audio files",
-          "items": {
-            "type": "string"
-          }
-        },
         "gothicAudio.audioDir": {
           "type": "string",
-          "default": "E:\\Gothic\\_work\\DATA\\Sound\\Speech",
-          "description": "Custom base directory for audio files (overrides searchPaths if set)"
+          "default": "",
+          "description": "Base directory for Gothic audio files (e.g., Gothic/Data/Speech)"
         },
         "gothicAudio.volume": {
           "type": "number",
