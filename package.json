@@ -2,7 +2,7 @@
   "name": "gothic-audio-player",
   "displayName": "Gothic Audio Player",
   "description": "Play Gothic dialogue audio files and fix Silesian encoding directly in the editor.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "MTCode",
   "icon": "gothic_ii_desktop_icon_by_tarvanis.png",
   "repository": {
@@ -85,9 +85,9 @@
             "process-start"
           ],
           "enumDescriptions": [
-            "Standard WAV files (uses Windows Media Player)",
-            "Vorbis OGG or other formats via FFplay (requires FFmpeg installation)",
-            "Start file with default system player (opens external application)"
+            "Standard WAV files (Windows: Media Player, macOS: afplay, Linux: paplay/aplay)",
+            "Vorbis OGG or other formats via FFplay (requires FFmpeg installation, cross-platform)",
+            "Start file with default system player (opens external application, cross-platform)"
           ],
           "description": "Audio playback method"
         },
